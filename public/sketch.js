@@ -1,19 +1,43 @@
 var socket;
 var sessionid;
+var borderColor = '#e0e4cc';
+
+
 
 function setup() {
-  createCanvas(displayWidth, displayHeight);
+
+  createCanvas(windowWidth, windowHeight);
   angleMode(DEGREES);
-  socket = io.connect('http://10.10.200.110:3000/');
+  socket = io.connect('http://192.168.0.159:3000');
   socket.on('connect', function () {
     sessionid = socket.id;
     console.log(sessionid);
   });
   socket.on('mouse', newDrawing)
+  socket.on('intro', setColor)
 }
+
+function touchStarted() {
+  var fs = fullscreen();
+  if (!fs) {
+    fullscreen(true);
+  }
+}
+
+function windowResized() {
+  resizeCanvas(windowWidth, windowHeight);
+}
+
 
 function newDrawing(data) {
   console.log("Data from other " + data);
+}
+
+function setColor(data) {
+  console.log("Data from other host " + data);
+  borderColor = data;
+  console.log(typeof borderColor);
+
 }
 
 function draw() {
@@ -36,12 +60,13 @@ function draw() {
   }
 
   noFill();
-  stroke('#3AA99E');
-  strokeWeight(5);
+  stroke(borderColor);
+  strokeWeight(10);
   rect(2, 2, width - 4, height - 4);
 }
 
-function mousePressed() {
+function mouseDragged() {
+
   console.log("Sending Data: " + mouseX + "," + mouseY);
   var data = {
     id: sessionid,
