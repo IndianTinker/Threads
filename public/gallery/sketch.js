@@ -7,6 +7,8 @@ var spacing = 100;
 var spacing2 = 100;
 var strokeW = 100;
 var spacing2buf = 0;
+var mMax = 0;
+var maxUp = false;
 
 function setup() {
 
@@ -21,12 +23,15 @@ function setup() {
   //socket.on('intro', setColor)
   socket.on('borders', updateBorders);
   strokeW = Math.floor(width / 20);
+  mic = new p5.AudioIn()
+  mic.start();
+
 }
 
 function updateBorders(data) {
   console.log(data);
   borders = data;
-  m = constrain((borders.length - 1) * 20, 0, 400);
+  m = constrain((borders.length - 1) * 20, 5, 400);
   console.log(m);
   // for (var i = 0; i < data.length; i++) {
   //   //console.log(data[i].color)
@@ -78,7 +83,7 @@ function setColor(data) {
 
 function draw() {
   //background(0);
-
+  var borderLen = borders.length;
   c = color(0);
   c.setAlpha(70);
   fill(c);
@@ -86,6 +91,23 @@ function draw() {
   strokeWeight(1);
   noFill();
   stroke(255);
+  // if (borderLen < 4) {
+  //   m = Math.floor((m + 2) * (0.5 + mic.getLevel() * 1.2));
+
+  // } else {
+  //   mMax = Math.floor(m + (borderLen * mic.getLevel() * 2));
+  //   if (m > mMax) {
+  //     maxUp = true;
+  //     m--;
+  //   } else if (m < mMax && !maxUp) {
+  //     m++;
+  //   }
+
+  // }
+  // console.log("m " + m);
+  // console.log("mMx " + mMax);
+  m = Math.floor((m + 2) * (0.5 + mic.getLevel() * 2));
+
   // var spacing = map(mouseX, 0, width, 20, 180);
   // var spacing2 = map(mouseY, 0, height, 5, 120);
   beginShape();
@@ -100,7 +122,7 @@ function draw() {
   }
 
   noFill();
-  var borderLen = borders.length;
+
   if (borderLen <= 0) {
     stroke(borderColor);
     strokeWeight(strokeW);
