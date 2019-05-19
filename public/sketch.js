@@ -1,8 +1,8 @@
 var socket;
 var sessionid;
 var borderColor = '#e0e4cc';
-
-
+var strokeW = 100;
+var i = 0;
 
 function setup() {
 
@@ -15,6 +15,7 @@ function setup() {
   });
   socket.on('mouse', newDrawing)
   socket.on('intro', setColor)
+  strokeW = Math.floor(width / 50);
 }
 
 function touchStarted() {
@@ -26,6 +27,7 @@ function touchStarted() {
 
 function windowResized() {
   resizeCanvas(windowWidth, windowHeight);
+  strokeW = Math.floor(windowWidth / 50);
 }
 
 
@@ -61,17 +63,18 @@ function draw() {
 
   noFill();
   stroke(borderColor);
-  strokeWeight(10);
-  rect(2, 2, width - 4, height - 4);
+  strokeWeight(strokeW);
+  rect(strokeW / 2, strokeW / 2, width - strokeW, height - strokeW);
 }
 
 function mouseDragged() {
-
-  console.log("Sending Data: " + mouseX + "," + mouseY);
+  var cVal = dist(width / 2, height / 2, mouseX, mouseY);
+  cVal = Math.floor(cVal);
+  console.log(cVal);
+  //console.log("Sending Data: " + mouseX + "," + mouseY);
   var data = {
     id: sessionid,
-    x: mouseX,
-    y: mouseY
+    val: cVal
   }
   socket.emit('mouse', data);
 

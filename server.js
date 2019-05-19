@@ -3,8 +3,9 @@ var colors = require('nice-color-palettes/200');
 var app = express();
 var server = app.listen(3000);
 var i = 0;
-var colorClientArray = [];
-
+var clientArray = [];
+var sumClients = 0;
+var avgClient;
 app.use(express.static('public'));
 
 console.log("Server is running");
@@ -24,29 +25,57 @@ function newConnection(socket) { //This particular socket or client
     socket.emit('intro', colorRand);
     var data = {
         'id': socket.id,
-        'color': colorRand
+        'color': colorRand,
+        'val': 0
     }
-    colorClientArray.push(data);
-    console.log(colorClientArray)
+    clientArray.push(data);
+    console.log(clientArray)
     socket.on('mouse', mouseMsg);
+    io.sockets.emit('borders', clientArray);
+    socket.on('draw', (data) => {
+        console.log(data);
 
+    })
 
     socket.on('disconnect', () => {
         var deadSoc = socket.id
         console.log(deadSoc + " disconnected");
         console.log("Client remaining: " + socket.conn.server.clientsCount);
-        for (var i = 0; i < colorClientArray.length; i++) {
-            if (colorClientArray[i].id == deadSoc) {
-                colorClientArray.splice(i, 1);
+        for (var i = 0; i < clientArray.length; i++) {
+            if (clientArray[i].id == deadSoc) {
+                clientArray.splice(i, 1);
             }
         }
-        console.log(colorClientArray)
+        console.log(clientArray)
+        socket.broadcast.emit('borders', clientArray);
     })
 
 
     function mouseMsg(data) {
-        console.log(data);
-        socket.broadcast.emit('mouse', data);
-        //io.sockets.emit('mouse', data)
+        //console.log(data.val);
+
+        for (var i = 0; i < clientArray.length; i++) {
+            if (clientArray[i].id == data.id) {
+                clientArray[i].val = data.val;
+            }
+
+        }
+
+
+        console.log(clientArray);
+        sumClients = 0;
+        for (var i = 0; i < clientArray.length; i++) {
+            sumClients = sumClients + clientArray[i].val;
+
+        }
+        console.log('sum: ' + sumClients);
+        avgClient = sumClients / (clientArray.length - 1)
+        console.log('avg: ' + avgClient);
+
+        socket.broadcast.emit('drawData', avgClient);
+
     }
+    //io.sockets.emit('mouse', data)
+
+
 }
