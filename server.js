@@ -1,7 +1,11 @@
 var express = require('express')
 var colors = require('nice-color-palettes/200');
 var app = express();
-var server = app.listen(3000);
+let port = process.env.PORT;
+if (port == null || port == "") {
+    port = 8000;
+}
+var server = app.listen(port);
 var i = 0;
 var clientArray = [];
 var sumClients = 0;

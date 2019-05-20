@@ -8,7 +8,7 @@ function setup() {
 
   createCanvas(windowWidth, windowHeight);
   angleMode(DEGREES);
-  socket = io.connect('http://192.168.0.159:3000');
+  socket = io.connect('https://threads-function-rohit.herokuapp.com/');
   socket.on('connect', function () {
     sessionid = socket.id;
     console.log(sessionid);
